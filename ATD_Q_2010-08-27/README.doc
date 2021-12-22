@@ -1,0 +1,111 @@
+-------------------------------- --------------------------------
+Files
+-------------------------------- --------------------------------
+
+The main files are the following: 
+
+	modifyme.m     
+		- is the only file that should need modifying once the experiment is run
+
+	runexp.m       
+		- is the master file. All other scripts are called by this file.  This is the
+		  file that should be run in the matlab window to start the experiment. 
+
+The files that do the main work are: 
+
+	preps.m        
+		- is the file that sets up the stimulus presentation sequences, ensuring that
+		  all stimuli, actions and presentations are counterbalanced etc. 
+
+	setup.m        
+		- sets up the display variables, starts psychtoolbox and its sound
+		  subcomponent, and loads all the images that'll be needed. 
+
+	pittraining.m  
+		- is the instrumental training 
+
+	pit.m          
+		- is the PIT 
+
+	pavlov.m       
+		- is the pavlovian training
+
+	compare.m      
+		- are the test trials interleaved with the Pavlovian training
+
+
+Any file with 'instr' in it is some sort of instruction.  In addition, there are
+two .mat files with random numbers which I use to counterbalance
+approach/withdrawal presentation order across subjects. Finally, there are a
+couple of 'helper' files for stuff I use a lot again and again: 
+
+	centermouseclick.m 
+		- displays the organge square to re-centre the mouse after each trial
+
+	checkabort.m   
+		- To abort, hold down the escape key and click with the mouse a couple of
+		  times. This file aborts the experiment if you do that. 
+
+	displaytext.m and displaycentraltext.m 
+		- are files that display text, either just a single line or a series of
+		  lines, nicely centred
+
+	givebreak.m    
+		- inserts a 2 minute break after the first block
+
+	mygetclicks.m  
+		- waits for a mouse click
+
+
+-------------------------------- --------------------------------
+Variables
+-------------------------------- --------------------------------
+
+I guess it might be helpful to just mention a few of the variable names and
+their meaning. The ones that need altering are in the 'modifyme' script, and are
+commented there. 
+
+approach is 1 if the current block is an approach block, 0 otherwise
+
+nt   - instrumental trial number 
+np   - pavlovian trial number 
+npit - PIT trial number 
+
+ch, cht, chq
+	- variables indicating the subjects' choice in the PIT, instrumental and
+	  Pavlovian 'compare' trials respectively. These are 0,1,2,3 or NaN. They are
+	  0 if the subject made an invalid trial, 1 2 3 for the box in which the
+	  subject clicked, and NaN if the click was outside a box. 
+
+cr, crt, crm 
+	- whether correct action in PIT or instrumental block was chosen, or whether
+	  correct Pavlovian stimulus was chosen in the Pavlovian comparison trials
+
+pavreact, pitreact and treact 
+	- reaction times in Pavlovian 'compare' trials, PIT trials and instrumental
+	  trials respectively
+
+Instrumental block
+
+	ainst    correct response (go or nogo) for each trial
+	mprest	which mushroom to present in each trial
+	lrt		whether to present mushroon on right or left of centre
+	crtfb		whether to give accurate or erroneous feedback 
+	crt		whether correct action chosen 
+	r			whether a reward or punishment was given 
+
+PIT block	
+	
+	ains    	correct response (go or nogo) for each trial
+	mpres		which mushroom to present in each trial
+	mpresp	which Pavlovian stimulus to tile the background with
+	lr			whether to present mushroon on right or left of centre
+	cr			whether correct action made 
+
+Pavlovian block 
+	
+	pavpres	which Pavlovian stimulus to present
+	posp		whether to present the Pavlovian stimulus on left or right
+	cppres	which two Pavlovian stimuli to present on comparison trials 
+	crm		whether the correct (better) Pavlovian stimulus was chosen on comparison trials
+
