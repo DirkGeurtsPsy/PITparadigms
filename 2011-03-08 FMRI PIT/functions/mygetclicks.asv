@@ -1,0 +1,14 @@
+[ keyIsDown, timeSecs, keyCode ] = KbCheck; 
+ while ~keyIsDown; 
+     [ keyIsDown, timeSecs, keyCode ] = KbCheck; 
+     if keyIsDown && find(keyCode)~=53
+         break
+     elseif find(keyCode)==53
+         while KbCheck end
+     end
+ end
+ while KbCheck end 
+g
+%  buttons=[0 0 0 0];
+% while ~any(buttons);[x,y,buttons]=GetMouse;end
+% while  any(buttons);[x,y,buttons]=GetMouse;end

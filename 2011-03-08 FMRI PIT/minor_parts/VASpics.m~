@@ -1,0 +1,348 @@
+% use this as vas for received drinks. give ss 3 drops of first the nasty,
+% then the nice juice. nasty first to avoid the bad aftertaste
+% =========================================================================
+
+
+% % =========================================================================
+% % uncomment when using as standalone. don't forget the last 'close
+% % screen' bit.
+%
+% % use when in debugging mode
+% % wd      = screen('openwindow', 0, [0 0 0], [0 0 1000 800]);
+% % use when in run mode
+% wd = screen('openwindow', 0, [0 0 0], []);
+% hidecursor;
+%
+% % get the size of the screen
+% prep.draw.font      = 'arial';
+% prep.draw.txtsize   = 25;
+% prep.lang           = 'eng';
+% prep.draw.ncol      = [160 160 160];
+% prep.draw.sqcol     = [150 0 255];
+% prep.draw.dropcol   = [0 0 255];
+% barcol   = [255 200 0];
+% prep.comp           = 0;
+% screen('preference','verbosity',0);
+% screen(wd,'textstyle',1); % bold
+% screen(wd,'textfont',prep.draw.font);
+% screen(wd,'textsize',prep.draw.txtsize);
+% prep.left   = 65;
+% prep.right  = 83;
+% prep.confirm= 68;
+% vasrep      = 1;
+% %=========================================================================
+
+% spacing     = 2; % distance between lines, in multiples of textsize
+% [wdw, wdh]  = [widthwindowrect,heightwindowrect] ;
+scalecol    = [160 160 160];
+barcol      = [255 200 0];
+slider      = [0 0 10 50];
+stepsize    = 16; %stepsize of the slider
+% position of the vas scale
+xaxis       = [0.1*wdw 0.9*wdw; 0.7*wdh 0.7*wdh];
+yleft       = [0.1*wdw 0.1*wdw; 0.65*wdh 0.75*wdh];
+ymid        = [0.5*wdw 0.5*wdw; 0.65*wdh 0.75*wdh];
+yright      = [0.9*wdw 0.9*wdw; 0.65*wdh 0.75*wdh];
+top         = wdh/12;
+
+% present black screen for sec before starting
+screen('fillrect',wd,bgcol(1));
+screen('flip', wd);
+waitsecs(0.2);
+
+% =========================================================================
+% display instructions
+
+if dutch==1
+    text{1} = {'smaak beoordelen'};
+    text{2} = {'je gaat nu eerst de smaak van de sappen beoordelen.'};
+    text{3} = {'je proeft dadelijk eerst een beetje van het bittere sap.',...
+        'vervolgens kan je met de slider op een scorebalk',...
+        'aangeven hoe lekker je dit drankje vond.',...
+        'daarna krijg je het zoete sap te proeven',...
+        'dan beoordeel je die ook.'};
+    text{4} = {'het scoren doe je door een cursor met de drukknoppen','naar links en rechts te bewegen.'};
+elseif english==1
+    text{1} = {'taste rating'};
+    text{2} = {'you will first receive the bitter and sweet juices','to rate their taste.'};
+    text{3} = {'first you receive the bitter juice. you then indicate',...
+        'on a rating scale how you liked this drink.',...
+        'next you will receive the sweet juice to taste, ','which you then also rate.'};
+    text{4} = {'the ratings are done by moving the cursor,', 'using the left and right buttons.'};
+end
+
+for t = 1:4
+    displaytext(text{t},wd,wdw,wdh,orange,0,0);
+    waitsecs(0.2);
+    mygetclicks;
+end
+
+% give subject first the nasty, then the nice one. in this order so they
+% don't have to sit around with the disgusting taste in their mouth for too
+% long.
+for s=1:2
+    bottomslider=centerrectonpoint(slider,0.5*wdw,0.6*wdh); % starting position slider
+    xpos          = 0.5*wdw;
+    
+    if dutch==1
+        text{1}={'je krijgt nu het bittere sapje tweemaal toegediend',...
+            '(met korte tussenpozen)','proef het goed.'};
+        text{2}={'je krijgt nu het zoete sapje tweemaal toegediend',...
+            '(met korte tussenpozen)','proef het goed.'};
+    elseif english==1
+        text{1}={'you will now receive the bitter juice two times',...
+            '(with short breaks in between).','taste it well.'};
+        text{2}={'you will now receive the sweet juice two times',...
+            '(with short breaks in between).','taste it well.'};
+    end
+    
+    displaytext(text{s},wd,wdw,wdh,orange,0,0);
+    waitsecs(0.2);
+    mygetclicks;
+    for i=1:2
+        if s==1; fprintf('............. nasty\n');
+        elseif s==2; fprintf('............. nice\n');
+        end
+        if com~=0;
+            stepdos.runpump(abs(s-3)); %run first pump 2, then pump 1
+            waitsecs(3);
+        end
+    end
+    
+    % let the subject evaluate the juice by moving the slider
+    while true
+        if dutch==1
+            txt1 = {'verplaats de balk met de linker (wijsvinger)',...
+                'en rechter (middelvinger) druktoetsen',...
+                'naar de plek die je vindt passen bij de smaak',...
+                'van het sapje.'...
+                'druk dan op bevestigingstoets (ringvinger)'};
+            txt2 = {'heel vies','neutraal','heel lekker'};
+            txt3 = {'druk nogmaals om te bevestigen,'...
+                'of links of rechts om de balk te verplaatsen'};
+            
+        elseif english==1
+        end
+        nrow=length(txt1);
+        for k=1:nrow
+            [wt]=screen(wd,'textbounds',txt1{k});
+            xpos1=wdw/2-wt(3)/2;
+            ypos1=0.1*wdh+2*k*wt(4);
+            screen('drawtext',wd,txt1{k},xpos1,ypos1,orange);
+        end
+        
+        screen('drawtext',wd,txt2{1},0.1*wdw,0.8*wdh,barcol);
+        [wt] = screen(wd,'textbounds',txt2{2});
+        screen('drawtext',wd,txt2{2},0.5*wdw-wt(3)/2,0.8*wdh,barcol);
+        [wt] = screen(wd,'textbounds',txt2{3});
+        screen('drawtext',wd,txt2{3},0.9*wdw-wt(3),0.8*wdh,barcol);
+        
+        screen('drawlines',wd,xaxis,2,scalecol);%draw scale
+        screen('drawlines',wd,yleft,2,scalecol);
+        screen('drawlines',wd,ymid,2,scalecol);
+        screen('drawlines',wd,yright,2,scalecol);
+        
+        screen('fillrect', wd, barcol, bottomslider);
+        screen('flip', wd,[],1);
+        
+        % check whether they've pressed a key
+        % if they did, move the slider.
+        kbwait;
+        [ keyisdown, timesecs, keycode ] = kbcheck;
+        if keycode(leftkey)|keycode(button49)
+            xpos=xpos-stepsize;
+            %     dd   sssssssssdd  slightly silly bit of trick code needed because the previous
+            % flip doesn't remove the background so i can add the
+            % confirmation question...
+            txt = {' '};
+            screen('drawtext',wd,txt{1},wdw/2,0.4*wdh,orange);
+            screen('flip', wd);
+            
+        elseif keycode(rightkey)|keycode(button50);
+            xpos=xpos+stepsize;
+            txt = {' '};
+            screen('drawtext',wd,txt{1},wdw/2,0.4*wdh,orange);
+            screen('flip', wd);
+            
+        elseif keycode(choicekey)|keycode(button51);
+            nr=length(txt3);
+            for k=1:nr
+                [wt] = screen(wd,'textbounds',txt3{k});
+                xtxt = round(wdw/2-wt(3)/2);
+                ytxt = round(wdh-(top+txtsize)+ k*wt(4));
+                screen('drawtext',wd,txt3{k},xtxt,ytxt,orange);
+                
+            end
+            screen('flip', wd);
+            waitsecs(0.2)%wait to make sure we don't use the same kbcheck twice
+            kbwait; %wait for confirmation or continuation
+            [ keyisdown, timesecs, keycode ] = kbcheck;
+            if keycode(choicekey)|keycode(button51);
+                break; % break out of the loop if they think they sorted it out
+            end
+        end
+        
+        % don't let spot move outside vasslider
+        if xpos<=0.1*wdw;
+            xpos=0.1*wdw;
+        end
+        if xpos>=0.9*wdw;
+            xpos=0.9*wdw;
+        end
+        % calculate new position slider
+        bottomslider=centerrectonpoint(slider,xpos,0.6*wdh);
+        
+    end
+    ovas(vasn,s)=(xpos-0.1*wdw)/(0.9*wdw-0.1*wdw); %sla percentage van balk op in vector.
+    
+    if dutch==1
+        text={'dankjewel!'};
+    elseif english==1
+        text={'thank you!'};
+    end
+    displaytext(text,wd,wdw,wdh,orange,0,0);
+    mygetclicks;
+    
+    
+end
+
+if dutch==1
+    text{1} = {'plaatjes beoordelen'};
+    text{2} = {'je gaat nu een zestal plaatjes beoordelen.'};
+    text{3} = {'je krijgt telkens een plaatje te zien',...
+        'vervolgens kan je met de slider op een scorebalk',...
+        'aangeven hoe leuk je dit plaatje vond.',...
+        'daarna krijg je weer een ander plaatje te zien',...
+        'dan beoordeel je die ook.'};
+    text{4} = {'het scoren doe je door een cursor met de drukknoppen','naar links en rechts te bewegen.'};
+elseif english==1
+end
+
+for t = 1:4
+    displaytext(text{t},wd,wdw,wdh,orange,0,0);
+    waitsecs(0.2);
+    mygetclicks;
+end
+
+for s=1:6
+    bottomslider=centerrectonpoint(slider,0.5*wdw,0.6*wdh); % starting position slider
+    xpos          = 0.5*wdw;
+    
+    if dutch==1
+        text{1}={'je krijgt nu 3 seconden een plaatje te zien',...
+            'bekijk het goed.'};
+    elseif english==1
+    end
+    
+    displaytext(text{1},wd,wdw,wdh,orange,0,0);
+    waitsecs(0.2);
+    mygetclicks;
+    
+    if s<4
+        screen('drawtexture',wd,bgshape(1,ap(1,s)),[],bgr);
+    else
+        screen('drawtexture',wd,bgshape(2,ap(1,s)),[],bgr);
+    end
+    
+    screen('flip', wd);
+    waitsecs(3);
+    
+    % let the subject evaluate the picture by moving the slider
+    while true
+        if dutch==1
+            txt1 = {'verplaats de balk met de linker (wijsvinger)',...
+                'en rechter (middelvinger) druktoetsen',...
+                'naar de plek die je vindt passen bij het plaatje',...
+                'druk dan op bevestigingstoets (ringvinger)'};
+            txt2 = {'helemaal niet leuk','neutraal','heel leuk'};
+            txt3 = {'druk nogmaals om te bevestigen,'...
+                'of links of rechts om de balk te verplaatsen'};
+            
+        elseif english==1
+        end
+        nrow=length(txt1);
+        for k=1:nrow
+            [wt]=screen(wd,'textbounds',txt1{k});
+            xpos1=wdw/2-wt(3)/2;
+            ypos1=0.1*wdh+2*k*wt(4);
+            screen('drawtext',wd,txt1{k},xpos1,ypos1,orange);
+        end
+        
+        screen('drawtext',wd,txt2{1},0.1*wdw,0.8*wdh,barcol);
+        [wt] = screen(wd,'textbounds',txt2{2});
+        screen('drawtext',wd,txt2{2},0.5*wdw-wt(3)/2,0.8*wdh,barcol);
+        [wt] = screen(wd,'textbounds',txt2{3});
+        screen('drawtext',wd,txt2{3},0.9*wdw-wt(3),0.8*wdh,barcol);
+        
+        screen('drawlines',wd,xaxis,2,scalecol);%draw scale
+        screen('drawlines',wd,yleft,2,scalecol);
+        screen('drawlines',wd,ymid,2,scalecol);
+        screen('drawlines',wd,yright,2,scalecol);
+        
+        screen('fillrect', wd, barcol, bottomslider);
+        screen('flip', wd,[],1);
+        
+        % check whether they've pressed a key
+        % if they did, move the slider.
+        kbwait;
+        [ keyisdown, timesecs, keycode ] = kbcheck;
+        if keycode(leftkey)|keycode(button49)
+            xpos=xpos-stepsize;
+            %     dd   sssssssssdd  slightly silly bit of trick code needed because the previous
+            % flip doesn't remove the background so i can add the
+            % confirmation question...
+            txt = {' '};
+            screen('drawtext',wd,txt{1},wdw/2,0.4*wdh,orange);
+            screen('flip', wd);
+            
+        elseif keycode(rightkey)|keycode(button50);
+            xpos=xpos+stepsize;
+            txt = {' '};
+            screen('drawtext',wd,txt{1},wdw/2,0.4*wdh,orange);
+            screen('flip', wd);
+            
+        elseif keycode(choicekey)|keycode(button51);
+            nr=length(txt3);
+            for k=1:nr
+                [wt] = screen(wd,'textbounds',txt3{k});
+                xtxt = round(wdw/2-wt(3)/2);
+                ytxt = round(wdh-(top+txtsize)+ k*wt(4));
+                screen('drawtext',wd,txt3{k},xtxt,ytxt,orange);
+                
+            end
+            screen('flip', wd);
+            waitsecs(0.2)%wait to make sure we don't use the same kbcheck twice
+            kbwait; %wait for confirmation or continuation
+            [ keyisdown, timesecs, keycode ] = kbcheck;
+            if keycode(choicekey)|keycode(button51);
+                break; % break out of the loop if they think they sorted it out
+            end
+        end
+        
+        % don't let spot move outside vasslider
+        if xpos<=0.1*wdw;
+            xpos=0.1*wdw;
+        end
+        if xpos>=0.9*wdw;
+            xpos=0.9*wdw;
+        end
+        % calculate new position slider
+        bottomslider=centerrectonpoint(slider,xpos,0.6*wdh);
+        
+    end
+    ovaspic(vasn,s)=(xpos-0.1*wdw)/(0.9*wdw-0.1*wdw); %sla percentage van balk op in vector.
+    
+    if dutch==1
+        text={'dankjewel!'};
+    elseif english==1
+        text={'thank you!'};
+    end
+    displaytext(text,wd,wdw,wdh,orange,0,0);
+    mygetclicks;
+    
+    
+end
+% % comment out when not standalone
+% screen('closeall');
+% clear screen
+
